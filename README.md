@@ -8,7 +8,7 @@ ZDNS is a command-line utility that provides high-speed DNS lookups. For
 example, the following will perform MX lookups and a secondary A lookup for the
 IPs of MX servers for the domains in the Alexa Top Million:
 
-	cat top-1m.csv | zdns MX --ipv4-lookup --alexa
+	cat top1m-alexa.csv  | zdns alookup  --ipv4-lookup --alexa
 
 ZDNS is written in golang and is primarily based on https://github.com/miekg/dns.
 
@@ -32,6 +32,23 @@ The `A`, `AAAA`, `ANY`, `AXFR`, `CAA`, `CNAME`, `DMARC`, `MX`, `NS`, `PTR`, `TXT
 `SOA`, and `SPF` modules provide the raw DNS response in JSON form, similar to dig.
 
 For example, the command:
+----------
+
+returns:
+```json
+echo "2,baidu.com" | ./zdns alookup --ipv4-lookup --alexa
+{
+	"name": "baidu.com",
+	"class": "IN",
+	"alexa_rank": 2,
+	"status": "NOERROR",
+	"timestamp": "2017-11-15T02:10:31-05:00",
+	"data": {
+		"ipv4_addresses": ["123.125.114.144","220.181.57.217","111.13.101.208"]
+	}
+}
+```
+----------
 
 	echo "censys.io" | zdns A
 
