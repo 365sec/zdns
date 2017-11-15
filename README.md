@@ -33,10 +33,10 @@ The `A`, `AAAA`, `ANY`, `AXFR`, `CAA`, `CNAME`, `DMARC`, `MX`, `NS`, `PTR`, `TXT
 
 For example, the command:
 ----------
-
+       echo "2,baidu.com" | ./zdns alookup --ipv4-lookup --alexa
 returns:
 ```json
-echo "2,baidu.com" | ./zdns alookup --ipv4-lookup --alexa
+
 {
 	"name": "baidu.com",
 	"class": "IN",
