@@ -22,9 +22,10 @@ import (
 	"strings"
 	"sync"
 	"time"
-
+	"regexp"
 	"github.com/miekg/dns"
 	log "github.com/sirupsen/logrus"
+
 )
 
 type routineMetadata struct {
@@ -70,6 +71,7 @@ func doLookup(g *GlobalLookupFactory, gc *GlobalConf, input <-chan interface{}, 
 	if err != nil {
 		log.Fatal("Unable to create new routine factory", err.Error())
 	}
+	var ipRegexp = regexp.MustCompile(`((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))`)
 	var metadata routineMetadata
 	metadata.Status = make(map[Status]int)
 	for genericInput := range input {
@@ -122,11 +124,22 @@ func doLookup(g *GlobalLookupFactory, gc *GlobalConf, input <-chan interface{}, 
 			if err != nil {
 				res.Error = err.Error()
 			}
-			jsonRes, err := json.Marshal(res)
-			if err != nil {
-				log.Fatal("Unable to marshal JSON result", err)
+			if gc.OutCvs {
+				jsonRes, err := json.Marshal(res.Data)
+				if err != nil {
+					log.Fatal("Unable to marshal JSON result", err)
+				}
+				dip :=ipRegexp.FindStringSubmatch(string(jsonRes))
+				if dip != nil{
+					output <- string(dip[0])+string(",")+res.Name
+				}
+			}else{
+				jsonRes, err := json.Marshal(res)
+				if err != nil {
+					log.Fatal("Unable to marshal JSON result", err)
+				}
+				output <- string(jsonRes)
 			}
-			output <- string(jsonRes)
 		}
 		metadata.Names++
 		metadata.Status[status]++
@@ -209,7 +222,9 @@ func aggregateMetadata(c <-chan routineMetadata) Metadata {
 	return meta
 }
 
+
 func DoLookups(g *GlobalLookupFactory, c *GlobalConf) error {
+
 	// doInput: take lines from input -> inChan
 	//	- closes channel when done processing
 	// doOutput: take serialized JSON from outChan and write

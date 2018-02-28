@@ -48,6 +48,16 @@ returns:
 	}
 }
 ```
+
+----------
+output cvs type
+       echo "baidu.com" | ./zdns alookup --ipv4-lookup   --outcvs
+returns:
+```cvs
+123.125.114.144,baidu.com
+
+```
+
 ----------
 
 	echo "censys.io" | zdns A

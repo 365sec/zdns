@@ -24,6 +24,7 @@ type GlobalConf struct {
 	AlexaFormat          bool
 	IterativeResolution  bool
 	Trace                bool
+	OutCvs               bool
 	MaxDepth             int
 	CacheSize            int
 	GoMaxProcs           int
